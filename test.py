@@ -1,5 +1,3 @@
-print(__doc__)
-
 import numpy as np
 import matplotlib.pyplot as plt
 from scipy import signal
@@ -34,47 +32,40 @@ woman_one = 'woman_one_a.wav'
 s1, sample2 = loadAudio(man_one)
 s2, sample2 = loadAudio(woman_one)
 
-
+# Concatenate both signals. Strip of the shortest
 S = np.c_[s1[:s2.shape[0]], s2]
-
-S += 0.2 * np.random.normal(size=S.shape)  # Add noise
-
-
-S /= S.std(axis=0)  # Standardize data
-# Mix data
+# Add a gaussian noise
+S += 0.2 * np.random.normal(size=S.shape)
+# Standarize the data
+S = (S - S.mean()) / S.std(axis=0)
+# Linear transformation matrix
 A = np.array([[0.1, 1], [0.5, 2]])
-
-X = np.dot(S, A.T)  # Generate observations
-
+# Linearly combine signals
+X = np.dot(S, A.T)
 # Compute ICA
 ica = FastICA(n_components=2)
-S_ = ica.fit_transform(X)  # Reconstruct signals
-A_ = ica.mixing_  # Get estimated mixing matrix
+
+S_ = ica.fit_transform(X)
+A_ = ica.mixing_
 
 # We can `prove` that the ICA model applies by reverting the unmixing.
 assert np.allclose(X, np.dot(S_, A_.T) + ica.mean_)
 
-# For comparison, compute PCA
-pca = PCA(n_components=2)
-H = pca.fit_transform(X)  # Reconstruct signals based on orthogonal components
-
 ###############################################################################
 # Plot results
-
 plt.figure()
 
-models = [X, S, S_, H]
+models = [X, S, S_]
 names = ['Observations (mixed signal)',
          'True Sources',
-         'ICA recovered signals',
-         'PCA recovered signals']
+         'ICA recovered signals']
+
 colors = ['steelblue', 'orange']
 
 for ii, (model, name) in enumerate(zip(models, names), 1):
-    plt.subplot(4, 1, ii)
+    plt.subplot(3, 1, ii)
     plt.title(name)
     for sig, color in zip(model.T, colors):
         plt.plot(sig, color=color)
 
-plt.subplots_adjust(0.09, 0.04, 0.94, 0.94, 0.26, 0.46)
 plt.show()
