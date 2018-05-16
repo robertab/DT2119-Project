@@ -27,21 +27,13 @@ def loadAudio(filename):
 
 
 ###############################################################################
-# Generate sample data
 np.random.seed(0)
-# n_samples = 2000
-# time = np.linspace(0, 8, n_samples)
-
-# s1 = np.sin(2 * time)  # Signal 1 : sinusoidal signal
-# s2 = np.sign(np.sin(3 * time))  # Signal 2 : square signal
-# s3 = signal.sawtooth(2 * np.pi * time)  # Signal 3: saw tooth signal
-
+# Signals to separate
 man_one = 'man_one_a.wav'
 woman_one = 'woman_one_a.wav'
 s1, sample2 = loadAudio(man_one)
 s2, sample2 = loadAudio(woman_one)
 
-# print(s1[:s2.shape[0]].shape, s2.shape)
 
 S = np.c_[s1[:s2.shape[0]], s2]
 
